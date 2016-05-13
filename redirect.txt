@@ -1,0 +1,25 @@
+Is It "2>&1 file" or "> file 2>&1"? Why?
+
+One of the common questions about the Bourne and Korn shells is why only the second command will redirect both stdout and stderr ( 13.1 ) to a file:
+
+
+$
+
+cat food 2>&1 >file
+
+
+cat: can't open food
+$
+
+cat food >file 2>&1
+
+
+$
+
+
+
+Although lots of sh manual pages don't mention this, the shell reads arguments from left to right.
+
+- On the first command line, the shell sees 2>&1 first. That means "make the standard error (file descriptor 2) go to the same place as the standard output (fd1) is going." There's no effect because both fd2 and fd1 are already going to the terminal. Then >file redirects fd1 ( stdout ) to file . But fd2 ( stderr ) is still going to the terminal.
+
+- On the second command line, the shell sees >file first and redirects stdout to file . Next 2>&1 sends fd2 ( stderr ) to the same place fd1 is going - that's to the file. And that's what you want.
